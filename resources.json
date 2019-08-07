@@ -299,7 +299,20 @@
           "reservedInstanceCount": 0,
           "fileChangeAuditEnabled": false
       }
-    }
+    },
+    {
+      "type": "Microsoft.Web/sites/hostNameBindings",
+      "apiVersion": "2016-08-01",
+      "name": "[concat(variables('webSiteName'), '/', variables('webSiteName'), '.azurewebsites.net')]",
+      "location": "West US",
+      "dependsOn": [
+          "[resourceId('Microsoft.Web/sites', variables('webSiteName'))]"
+      ],
+      "properties": {
+          "siteName": "[variables('webSiteName')]",
+          "hostNameType": "Verified"
+      }
+  }
   ],
   "outputs": {
     "websiteUrl": {
