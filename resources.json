@@ -116,7 +116,28 @@
       },
       "properties": {
         "name": "[variables('webSiteName')]",
-        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms/', variables('hostingPlanName'))]"
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms/', variables('hostingPlanName'))]",
+        "enabled": true,
+        "hostNameSslStates": [
+            {
+                "name": "[concat(variables('webSiteName'), '.azurewebsites.net')]",
+                "sslState": "Disabled",
+                "hostType": "Standard"
+            },
+            {
+                "name": "[concat(variables('webSiteName'), '.scm.azurewebsites.net')]",
+                "sslState": "Disabled",
+                "hostType": "Repository"
+            }
+        ],
+        "reserved": true,
+        "scmSiteAlsoStopped": false,
+        "clientAffinityEnabled": false,
+        "clientCertEnabled": false,
+        "hostNamesDisabled": false,
+        "containerSize": 0,
+        "dailyMemoryTimeQuota": 0,
+        "httpsOnly": false
       },
       "resources": [
         {
