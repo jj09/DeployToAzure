@@ -1,7 +1,6 @@
 {
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
-
   "parameters": {
     "hostingPlanSku": {
       "type": "string",
@@ -89,25 +88,6 @@
             "alwaysOn": true,
             "remoteDebuggingEnabled": false,
             "remoteDebuggingVersion": "VS2015"
-          }
-        },
-        {
-          "apiVersion": "2015-08-01",
-          "name": "appsettings",
-          "type": "config",
-          "dependsOn": [
-            "[concat('Microsoft.Web/sites/', variables('webSiteName'))]",
-            "[concat('Microsoft.Web/sites/', variables('webSiteName'), '/extensions/MSDeploy')]"
-          ],
-          "tags": {
-            "displayName": "WebAppSettings"
-          },
-          "properties": {
-            "AdminPrimaryKey": "[variables('adminPrimaryKey')]",
-            "AdminSecondaryKey": "[variables('adminSecondaryKey')]",
-            "RecommendPrimaryKey": "[variables('recommendPrimaryKey')]",
-            "RecommendSecondaryKey": "[variables('recommendSecondaryKey')]",
-            "ApplicationInsightsInstrumentationKey": "[reference(resourceId('Microsoft.Insights/components', variables('appInsightsName')), '2014-04-01').InstrumentationKey]"
           }
         },
         {
