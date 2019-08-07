@@ -3,17 +3,6 @@
   "contentVersion": "1.0.0.0",
 
   "parameters": {
-    "accountType": {
-      "type": "string",
-      "defaultValue": "Standard_LRS",
-      "allowedValues": [
-        "Standard_LRS",
-        "Standard_GRS"
-      ],
-      "metadata": {
-        "description": "Choose a Storage Account replication strategy:"
-      }
-    },
     "hostingPlanSku": {
       "type": "string",
       "allowedValues": [
@@ -35,19 +24,6 @@
         "description": "Choose an App Service plan (pricing tier):"
       }
     },
-    "appInsightsLocation": {
-      "type": "string",
-      "allowedValues": [
-        "East US",
-        "North Europe",
-        "West Europe",
-        "South Central US"
-      ],
-      "defaultValue": "East US",
-      "metadata": {
-        "description": "Choose an Application Insights supported deployment regions:"
-      }
-    },
     "deployPackageUri": {
       "type": "string",
       "defaultValue": "https://github.com/jj09/DeployToAzure/blob/master/hanselmansearch.zip?raw=true",
@@ -60,37 +36,11 @@
   "variables": {
     "uniqueNamePrefix": "[toLower(concat(resourceGroup().name, uniqueString(subscription().subscriptionId, resourceGroup().name)))]",
     "location": "[resourceGroup().location]",
-    "storageAccountName": "[concat(variables('uniqueNamePrefix'), 'st')]",
     "webSiteName": "[concat(variables('uniqueNamePrefix'), 'ws')]",
-    "appInsightsName": "[concat(variables('uniqueNamePrefix'), 'appInsights')]",
     "hostingPlanName": "[concat(variables('uniqueNamePrefix'), 'hostingplan')]",
-    "adminPrimaryKey": "[base64(uniqueString(resourceGroup().id, deployment().name, 'adminPrimaryKey'))]",
-    "adminSecondaryKey": "[base64(uniqueString(resourceGroup().id, deployment().name, 'adminSecondaryKey'))]",
-    "recommendPrimaryKey": "[base64(uniqueString(resourceGroup().id, deployment().name, 'recommendPrimaryKey'))]",
-    "recommendSecondaryKey": "[base64(uniqueString(resourceGroup().id, deployment().name, 'recommendSecondaryKey'))]"
   },
 
   "resources": [
-    {
-      "name": "[variables('storageAccountName')]",
-      "type": "Microsoft.Storage/storageAccounts",
-      "location": "[variables('location')]",
-      "apiVersion": "2016-01-01",
-      "sku": {
-        "name": "[parameters('accountType')]"
-      },
-      "kind": "Storage",
-      "properties": {
-        "encryption": {
-          "keySource": "Microsoft.Storage",
-          "services": {
-            "blob": {
-              "enabled": true
-            }
-          }
-        }
-      }
-    },
     {
       "name": "[variables('hostingPlanName')]",
       "type": "Microsoft.Web/serverfarms",
@@ -142,21 +92,6 @@
           }
         },
         {
-          "apiVersion": "2014-04-01",
-          "name": "[variables('appInsightsName')]",
-          "type": "Microsoft.Insights/components",
-          "location": "[parameters('appInsightsLocation')]",
-          "dependsOn": [
-            "[concat('Microsoft.Web/sites/', variables('webSiteName'))]"
-          ],
-          "tags": {
-            "displayName": "AppInsightsComponent"
-          },
-          "properties": {
-            "applicationId": "[variables('appInsightsName')]"
-          }
-        },
-        {
           "apiVersion": "2015-08-01",
           "name": "appsettings",
           "type": "config",
@@ -173,26 +108,6 @@
             "RecommendPrimaryKey": "[variables('recommendPrimaryKey')]",
             "RecommendSecondaryKey": "[variables('recommendSecondaryKey')]",
             "ApplicationInsightsInstrumentationKey": "[reference(resourceId('Microsoft.Insights/components', variables('appInsightsName')), '2014-04-01').InstrumentationKey]"
-          }
-        },
-        {
-          "apiVersion": "2015-08-01",
-          "name": "connectionstrings",
-          "type": "config",
-          "dependsOn": [
-            "[concat('Microsoft.Web/sites/', variables('webSiteName'))]",
-            "[concat('Microsoft.Web/sites/', variables('webSiteName'), '/extensions/MSDeploy')]",
-            "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
-          ],
-          "properties": {
-            "AzureWebJobsDashboard": {
-              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value)]",
-              "type": "Custom"
-            },
-            "AzureWebJobsStorage": {
-              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value)]",
-              "type": "Custom"
-            }
           }
         },
         {
@@ -218,25 +133,5 @@
       "type": "string",
       "value": "[concat('https://', reference(resourceId('Microsoft.Web/Sites', variables('webSiteName'))).hostNames[0])]"
     },
-    "recommendationsUI": {
-      "type": "string",
-      "value": "[concat('https://', reference(resourceId('Microsoft.Web/Sites', variables('webSiteName'))).hostNames[0], '/ui')]"
-    },
-    "recommendationsSwagger": {
-      "type": "string",
-      "value": "[concat('https://', reference(resourceId('Microsoft.Web/Sites', variables('webSiteName'))).hostNames[0], '/swagger')]"
-    },
-    "adminPrimaryKey": {
-      "value": "[variables('adminPrimaryKey')]",
-      "type": "string"
-    },
-    "recommendPrimaryKey": {
-      "value": "[variables('recommendPrimaryKey')]",
-      "type": "string"
-    },
-    "storageConnectionString": {
-      "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value)]",
-      "type": "string"
-    }
   }
 }
