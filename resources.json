@@ -93,8 +93,9 @@
       "type": "Microsoft.Web/serverfarms",
       "location": "[variables('location')]",
       "apiVersion": "2015-08-01",
+      "kind": "linux",
       "properties": {
-        "name": "[variables('hostingPlanName')]"
+          "name": "[variables('hostingPlanName')]",
       },
       "sku": {
         "name": "[parameters('hostingPlanSku')]"
